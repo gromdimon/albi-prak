@@ -139,6 +139,6 @@ N/A
 ## Contributors
 
 - Dzmitry Hramyka
-- Sofia Schorzina
-- Sofia Ilyina
-- Maxim Danilchik
+- Sofya Shorzhina
+- Sofiia Ilnytska
+- Maksim Danilchyk
