@@ -2,6 +2,8 @@
 
 The practical part of the course "Algorithmische Bioinformatik" (Algorithmic Bioinformatics) at the Freie Universität Berlin.
 
+![header](assets/header.png)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
