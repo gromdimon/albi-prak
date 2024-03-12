@@ -1,0 +1,83 @@
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ /group/albi-praktikum2023/software/bwa-mem2 mem -t 16 /group/albi-praktikum2023/data/NCBI-reference/GRCh38
+.fna /group/albi-praktikum2023/analysis/gruppe_3/aufgabe02/test_gruppe3_1.fastq.gz > /group/albi-praktikum2023/analysis/gruppe_3/aufgabe02/test_output.sam
+Looking to launch executable "/group/albi-praktikum2023/software/bwa-mem2.avx2", simd = .avx2
+Launching executable "/group/albi-praktikum2023/software/bwa-mem2.avx2"
+-----------------------------
+Executing in AVX2 mode!!
+-----------------------------
+* SA compression enabled with xfactor: 8
+* Ref file: /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna
+* Entering FMI_search
+* Index file found. Loading index from /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna.bwt.2bit.64
+* Reference seq len for bi-index = 6418915857
+* sentinel-index: 2729545408
+* Count:
+0,      1
+1,      1877984092
+2,      3209457929
+3,      4540931766
+4,      6418915857
+
+* Reading other elements of the index from files /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna
+* Index prefix: /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna
+* Read 261 ALT contigs
+* Done reading Index!!
+* Reading reference genome..
+* Binary seq file = /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna.0123
+* Reference genome size: 6418915856 bp
+* Done reading reference genome !!
+
+------------------------------------------
+1. Memory pre-allocation for Chaining: 2229.4236 MB
+2. Memory pre-allocation for BSW: 3833.8724 MB
+3. Memory pre-allocation for BWT: 1237.0268 MB
+------------------------------------------
+* Threads used (compute): 16
+* No. of pipeline threads: 2
+
+[0000] read_chunk: 160000000, work_chunk_size: 15000, nseq: 100
+        [0000][ M::kt_pipeline] read 100 sequences (15000 bp)...
+[0000] Calling mem_process_seqs.., task: 0
+[0000] 1. Calling kt_for - worker_bwt
+[0000] read_chunk: 160000000, work_chunk_size: 0, nseq: 0
+[0000] 2. Calling kt_for - worker_aln
+[0000] 3. Calling kt_for - worker_sam
+        [0000][ M::mem_process_seqs] Processed 100 reads in 0.740 CPU sec, 0.732 real sec
+[0000] read_chunk: 160000000, work_chunk_size: 0, nseq: 0
+[0000] Computation ends..
+No. of OMP threads: 16
+Processor is running @2394.707958 MHz
+Runtime profile:
+
+        Time taken for main_mem function: 10.81 sec
+
+        IO times (sec) :
+        Reading IO time (reads) avg: 0.00, (0.00, 0.00)
+        Writing IO time (SAM) avg: 0.00, (0.00, 0.00)
+        Reading IO time (Reference Genome) avg: 3.52, (3.52, 3.52)
+        Index read time avg: 6.48, (6.48, 6.48)
+
+        Overall time (sec) (Excluding Index reading time):
+        PROCESS() (Total compute time + (read + SAM) IO time) : 0.74
+        MEM_PROCESS_SEQ() (Total compute time (Kernel + SAM)), avg: 0.73, (0.73, 0.73)
+
+         SAM Processing time (sec):
+        --WORKER_SAM avg: 0.00, (0.00, 0.00)
+
+        Kernels' compute time (sec):
+        Total kernel (smem+sal+bsw) time avg: 0.73, (0.73, 0.73)
+                SMEM compute avg: 0.04, (0.71, 0.00)
+                SAL compute avg: 0.00, (0.00, 0.00)
+                                MEM_SA avg: 0.00, (0.00, 0.00)
+
+                BSW time, avg: 0.00, (0.01, 0.00)
+
+Important parameter settings:
+        BATCH_SIZE: 512
+        MAX_SEQ_LEN_REF: 256
+        MAX_SEQ_LEN_QER: 128
+        MAX_SEQ_LEN8: 128
+        SEEDS_PER_READ: 500
+        SIMD_WIDTH8 X: 32
+        SIMD_WIDTH16 X: 16
+        AVG_SEEDS_PER_READ: 64

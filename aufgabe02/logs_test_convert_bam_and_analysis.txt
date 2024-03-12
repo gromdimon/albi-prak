@@ -1,0 +1,25 @@
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ samtools view -S -b test_output.sam > test_output.bam
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ ls -a
+.  ..  make_subset.py  subset_output_file.fastq.gz  test_gruppe3_1.fastq.gz  test_output.bam  test_output.sam
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ samtools sort test_output.bam -o test_output_sorted.bam
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ samtools index test_output_sorted.bam
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ ls -a
+.  ..  make_subset.py  subset_output_file.fastq.gz  test_gruppe3_1.fastq.gz  test_output.bam  test_output.sam  test_output_sorted.bam  test_output_sorted.bam.bai
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ samtools flagstat test_output_sorted.bam
+100 + 0 in total (QC-passed reads + QC-failed reads)
+100 + 0 primary
+0 + 0 secondary
+0 + 0 supplementary
+0 + 0 duplicates
+0 + 0 primary duplicates
+100 + 0 mapped (100.00% : N/A)
+100 + 0 primary mapped (100.00% : N/A)
+0 + 0 paired in sequencing
+0 + 0 read1
+0 + 0 read2
+0 + 0 properly paired (N/A : N/A)
+0 + 0 with itself and mate mapped
+0 + 0 singletons (N/A : N/A)
+0 + 0 with mate mapped to a different chr
+0 + 0 with mate mapped to a different chr (mapQ>=5)
+hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$
