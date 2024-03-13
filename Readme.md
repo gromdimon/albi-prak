@@ -80,28 +80,58 @@ hrad04@compute04:/group/albi-praktikum2023/analysis/gruppe_3/aufgabe02$ ls -a
 Assess the quality of the mapping using SAMtools:
 
 ```sh
-samtools flagstat aligned_reads_sorted.bam
+samtools flagstat -o json aligned_reads_sorted.bam
 ```
 
 This was the output of the command:
 
-```sh
-100 + 0 in total (QC-passed reads + QC-failed reads)
-100 + 0 primary
-0 + 0 secondary
-0 + 0 supplementary
-0 + 0 duplicates
-0 + 0 primary duplicates
-100 + 0 mapped (100.00% : N/A)
-100 + 0 primary mapped (100.00% : N/A)
-0 + 0 paired in sequencing
-0 + 0 read1
-0 + 0 read2
-0 + 0 properly paired (N/A : N/A)
-0 + 0 with itself and mate mapped
-0 + 0 singletons (N/A : N/A)
-0 + 0 with mate mapped to a different chr
-0 + 0 with mate mapped to a different chr (mapQ>=5)
+```json
+{
+"QC-passed reads": {
+  "total": 733319951,
+  "primary": 727401006,
+  "secondary": 0,
+  "supplementary": 5918945,
+  "duplicates": 0,
+  "primary duplicates": 0,
+  "mapped": 731726121,
+  "mapped %": 99.78,
+  "primary mapped": 725807176,
+  "primary mapped %": 99.78,
+  "paired in sequencing": 727401006,
+  "read1": 363700503,
+  "read2": 363700503,
+  "properly paired": 709068384,
+  "properly paired %": 97.48,
+  "with itself and mate mapped": 724443610,
+  "singletons": 1363566,
+  "singletons %": 0.19,
+  "with mate mapped to a different chr": 11264042,
+  "with mate mapped to a different chr (mapQ >= 5)": 5927328
+ },
+ "QC-failed reads": {
+  "total": 0,
+  "primary": 0,
+  "secondary": 0,
+  "supplementary": 0,
+  "duplicates": 0,
+  "primary duplicates": 0,
+  "mapped": 0,
+  "mapped %": null,
+  "primary mapped": 0,
+  "primary mapped %": null,
+  "paired in sequencing": 0,
+  "read1": 0,
+  "read2": 0,
+  "properly paired": 0,
+  "properly paired %": null,
+  "with itself and mate mapped": 0,
+  "singletons": 0,
+  "singletons %": null,
+  "with mate mapped to a different chr": 0,
+  "with mate mapped to a different chr (mapQ >= 5)": 0
+ }
+}
 ```
 
 ## Step 4: Visualize Alignments in IGV
@@ -129,11 +159,7 @@ samtools depth -a aligned_reads_sorted.bam | awk '{cov[$1]+=$3; count[$1]++} END
 bedtools genomecov -ibam aligned_reads_sorted.bam -g reference_genome.fasta.fai > genome_coverage.txt
 ```
 
-The outputs were correspondingly:
-    
-```sh
-pass
-```
+The results can be seen in the files ... [TODO]
 
 ## Day3: Variant Calling
 
