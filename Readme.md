@@ -372,6 +372,66 @@ bcftools concat chr1_filtered_snps.vcf chr2_filtered_snps.vcf ... -o merged_filt
 
 Finally, we received the merged VCF file `merged_filtered_snps.vcf`, which was used for further analysis.
 
+### Step 5: Analyse and filtering of given VCF file
+We had to perform in 5 steps on this stage.
+
+1. Checking what our file contains:
+- Chromosome, f.e. chr1
+- Position, f.e. 21896830
+- ID, f.e. rs140261216
+- Reference allele, f.e. CTG 
+- Alternate allele(s) f.e. CACAC,TATACACAC,TCACACA,TCACACACA,TCACACACACA  
+- Quality score (QUAL) f.e. . 
+- Filter status (FILTER) f.e. .
+- Info fields (INFO) f.e. RS=139323070;RSPOS=6831944;dbSNPBuildID=134;SSR=0;SAO=0;VP=0x050000080005040036000100;GENEINFO=CAMTA1:23261;WGT=1;VC=SNV;INT;ASP;VLD;KGPhase1;KGPhase3;CAF=0.999,0.0009984;COMMON=1;TOPMED=0.99681447502548419,0.00318552497451580
+
+2. Interpret INFO field
+- RS (Reference SNP ID) - a unique identifier in the dbSNP database
+- RSPOS (Reference SNP Position) - the genomic position of the variant
+- RV (Reference allele(s) and Variation allele(s)) - this field is unspecified and can vary in this context. It could specify the reference allele and the variant allele or other relevant information
+- dbSNPBuildID - the version number of the dbSNP database in which this variant is included
+- SSR (SubSNP rsID) - an internal reference number for the variant in the dbSNP database
+- SAO (Variant Allele Origin) - a value indicating whether the variant allele was observed in the reference sequence (SAO=0) or not (SAO=1)
+- VP (Variant properties) - a bitflag encoding various information about the variant
+- GENEINFO - information about the gene affected by the variant 
+- WGT (Weight) - a weighting factor for the variant, usually 1
+- VC (Variant Class) - the class of the variant
+- ASP (Allele-specific properties) - information about the allele of the variant
+- VLD (Variant Locus-specific database) - information about whether the variant is present in a specific locus-specific database.
+- G5 (Allele frequency group) - information about the frequency of the variant allele in different population groups.
+- KGPhase1 and KGPhase3 - information about the frequency of the variant allele in the 1000 Genome Phase 1 and Phase 3 databases, respectively.
+- CAF (Combined Allele Frequency) - the combined allele frequency of the variant allele in different populations.
+- COMMON - a flag indicating whether the variant is common in the population (COMMON=1) or not (COMMON=0).
+- TOPMED - the allele frequency of the variant allele in the TOPMed database.
+
+3. Testing if the file contains only SNP (SNP)
+```sh
+zcat /group/albi-praktikum2023/data/dbSNP/dbSNP.vcf.gz | grep -v '^#' | awk '{if ($8 !~ /VT=SNP/ && $8 !~ /VC=SNV/) print}' | cut -f8
+```
+zcat - command to decompress the file with .gz format on-the-fly
+grep -v '^#' - filters out header lines (lines starting with #)
+awk - program used to process and format text lines
+if ($8 !~ /VT=SNP/ && $8 !~ /VC=SNV/) - if-condition to find variants types and classes, which are not SNP or SNV
+print - if statemenet is true, makes output 
+cut -f8 - extracts the eighth field (INFO) from each line of input
+
+In output, f.e, were:
+RS=200339231;RSPOS=4325724;dbSNPBuildID=137;SSR=0;SAO=0;VP=0x05000000000504003e000200;WGT=1;VC=DIV;ASP;VLD;KGPhase1;KGPhase3;CAF=0.9846,0.003594;COMMON=1;TOPMED=0.99357320336391437,0.00642679663608562
+
+So VC=DIV, it means file contains not only SNP.
+
+4. FIltering file dbSNP.vcf.gz and creating new file dbSNPfiltered.vcf, which contains only SNP(SNV)
+```sh
+zcat /group/albi-praktikum2023/data/dbSNP/dbSNP.vcf.gz | grep -v '^#' | awk -F '\t' '$8 ~ /VT=SNP/ || $8 ~ /VC=SNV/' > /group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/dbSNPfiltered.vcf
+```
+-F '\t' - this option sets the field separator to a tab character (\t). This is used to split each line into fields based on tabs
+'$8 ~ /VT=SNP/ || $8 ~ /VC=SNV/' - This condition checks if the eighth field ($8) contains the string "VT=SNP" OR "VC=SNV"
+
+5. Testing new created file, if it contains only SNP(SNV)
+```sh
+cat /group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/dbSNPfiltered.vcf | grep -v '^#' | awk '{if ($8 !~ /VT=SNP/ && $8 !~ /VC=SNV/) print}' | cut -f8
+```
+Ouput contained no strings, which means new file consist only of SNP
 
 ## Additional Information
 
