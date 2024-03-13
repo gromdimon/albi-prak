@@ -159,7 +159,7 @@ samtools depth -a aligned_reads_sorted.bam | awk '{cov[$1]+=$3; count[$1]++} END
 bedtools genomecov -ibam aligned_reads_sorted.bam -g reference_genome.fasta.fai > genome_coverage.txt
 ```
 
-The results can be seen in the files `aufgabe02/samtools_cov_per_chr.txt` and `aufgabe02/bedtools_genome_cov.txt`.
+The results can be seen in the files `aufgabe02/samtools_cov_per_chr.txt` and `aufgabe02/bedtools_cov_per_chr.txt`.
 
 ## Day3: Variant Calling
 
