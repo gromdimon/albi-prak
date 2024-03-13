@@ -40,10 +40,10 @@ In this practice we've learned how to ...
 
 ### Step 1: Run FastQC
 
-Since the FastQC was already installed on the server, we could run it using the following command:
+Since the FastQC was already installed on the server, we could run it using the following command, applying the fastq function on 2 input files, in particularly the parts of them with fast.gz extension:
 
 ```sh
-fastqc /group/albi-praktikum2023/analysis/gruppe_3/aufgabe01/test_gruppe3_1.fastq.gz
+/group/albi-praktikum2023/software/fastqc -o /group/albi-praktikum2023/analysis/gruppe_3/aufgabe01 --noextract -f fastq /group/albi-praktikum2023/data/1000-Genome-Project/gruppe3/* .fastq.gz
 ```
 
 ...
