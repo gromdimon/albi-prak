@@ -16,6 +16,11 @@ The practical part of the course "Algorithmische Bioinformatik" (Algorithmic Bio
     - [Step 3: Evaluate Mapping Quality](#step-3-evaluate-mapping-quality)
     - [Step 4: Visualize Alignments in IGV](#step-4-visualize-alignments-in-igv)
     - [Step 5: Calculate Coverage for Each Chromosome](#step-5-calculate-coverage-for-each-chromosome)
+- [Day3: Variant Calling](#day3-variant-calling)
+    - [Step 1: Add Read Groups](#step-1-add-read-groups)
+    - [Step 2: Splitting bam file by chromosome](#step-2-splitting-bam-file-by-chromosome)
+    - [Step 3: Variant Calling](#step-3-variant-calling)
+    - [Step 4: Merge VCFs](#step-4-merge-vcfs)
 - [Additional Information](#additional-information)
 - [Supervisors](#supervisors)
 - [Contributors](#contributors)
@@ -129,6 +134,218 @@ The outputs were correspondingly:
 ```sh
 pass
 ```
+
+## Day3: Variant Calling
+
+The task was to call variants from the aligned reads (the `.bam` file).
+
+### Step 1: Add Read Groups
+
+Before calling variants, we had to add read groups (RG) infromation to the `.bam` file. We used the AddOrReplaceReadGroups from the GATK Picard tools:
+
+```sh
+/group/albi-praktikum2023/software/picard.jar AddOrReplaceReadGroups \
+      I=/group/albi-praktikum2023/analysis/gruppe_3/gruppe3.bam \
+      O=/group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/pickard_output.bam \
+      RGID=4 \
+      RGLB=lib1 \
+      RGPL=illumina \
+      RGPU=unit1 \
+      RGSM=20
+``` 
+
+### Step 2: Splitting bam file by chromosome
+
+To harness the power of parallel computing, we split the `.bam` file into smaller files, each containing reads from a single chromosome. 
+For this purpose we wrote following c skript, which was based on the followig command:
+
+```sh
+samtools view -b input.bam chrN > chrN.bam
+```
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Adjust these values based on your actual requirements
+#define NUM_THREADS 24 // Example: Human chromosomes 1-22, X, and Y
+char *chromosomes[] = {"chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10",
+                       "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19",
+                       "chr20", "chr21", "chr22", "chrX", "chrY"}; // List of chromosomes
+
+typedef struct {
+    int thread_id;
+    char chromosome[10];
+} thread_data;
+
+void *splitBamFile(void *threadarg) {
+    thread_data *my_data;
+    my_data = (thread_data *) threadarg;
+    int tid = my_data->thread_id;
+    char *chr = my_data->chromosome;
+
+    printf("Thread %d splitting BAM for %s\n", tid, chr);
+
+    char command[256];
+    sprintf(command, "samtools view -b input.bam %s > %s.bam", chr, chr);
+    system(command);
+
+    printf("Thread %d finished splitting BAM for %s\n", tid, chr);
+    pthread_exit(NULL);
+}
+
+int main () {
+    pthread_t threads[NUM_THREADS];
+    thread_data thread_data_array[NUM_THREADS];
+    int rc;
+    long t;
+
+    for(t = 0; t < NUM_THREADS; t++) {
+        printf("In main: creating thread %ld for %s\n", t, chromosomes[t]);
+        thread_data_array[t].thread_id = t;
+        strcpy(thread_data_array[t].chromosome, chromosomes[t]);
+        rc = pthread_create(&threads[t], NULL, splitBamFile, (void *)&thread_data_array[t]);
+        if (rc) {
+            printf("ERROR; return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
+    }
+
+    // Wait for all threads to complete
+    for(t = 0; t < NUM_THREADS; t++) {
+        pthread_join(threads[t], NULL);
+    }
+
+    printf("Main: BAM splitting completed. Exiting.\n");
+    pthread_exit(NULL);
+}
+```
+
+### Step 3: Variant Calling
+
+We used the GATK to perform Variant Calling. The following command were crusial for this task:
+
+- `MarkDuplicates` to mark duplicates in the `.bam` file.
+```sh
+gatk MarkDuplicates \
+    -I chrN.bam \
+    -O chrN_marked_duplicates.bam \
+    -M chrN_marked_dup_metrics.txt
+```
+
+- `HaplotypeCaller` to call variants.
+```sh
+gatk HaplotypeCaller \
+    -R reference.fasta \
+    -I chrN_marked_duplicates.bam \
+    -O chrN_raw_variants.vcf
+```
+
+- `VariantFiltration` to filter the variants.
+```sh
+gatk VariantFiltration \
+    -R reference.fasta \
+    -V chrN_raw_variants.vcf \
+    -O chrN_filtered_snps.vcf \
+    --filter-expression "QD < 2.0 || FS > 60.0 || MQ < 40.0" \
+    --filter-name "SNP_FILTER"
+```
+
+Similarly to previous step, we wrote a c skript to run these commands in parallel (that's not the final version of the script):
+
+```c
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define NUM_THREADS 2 // This should match the number of chromosomes or tasks
+
+typedef struct {
+    int thread_id;
+    char chromosome[10]; // Adjust size as needed
+} thread_data;
+
+void *processChromosome(void *threadarg) {
+    thread_data *my_data;
+    my_data = (thread_data *) threadarg;
+    int tid = my_data->thread_id;
+    char *chr = my_data->chromosome;
+
+    printf("Thread %d processing chromosome %s\n", tid, chr);
+
+    // Construct command strings (simplified here)
+    char markDupCmd[256];
+    sprintf(markDupCmd, "gatk MarkDuplicates -I %s.bam -O %s_marked.bam -M %s_metrics.txt", chr, chr, chr);
+
+    char callVarCmd[256];
+    sprintf(callVarCmd, "gatk HaplotypeCaller -R reference.fasta -I %s_marked.bam -O %s_raw.vcf", chr, chr);
+
+    char filterSNPsCmd[256];
+    sprintf(filterSNPsCmd, "gatk VariantFiltration -R reference.fasta -V %s_raw.vcf -O %s_filtered.vcf --filter-expression \"QD < 2.0 || FS > 60.0 || MQ < 40.0\" --filter-name \"SNP_FILTER\"", chr, chr);
+
+    // Execute commands
+    system(markDupCmd);
+    system(callVarCmd);
+    system(filterSNPsCmd);
+
+    printf("Thread %d finished processing chromosome %s\n", tid, chr);
+    pthread_exit(NULL);
+}
+
+int main () {
+    pthread_t threads[NUM_THREADS];
+    thread_data thread_data_array[NUM_THREADS];
+    int rc;
+    long t;
+
+    char *chromosomes[] = {"chr1", "chr2"}; // Example chromosome names
+
+    for(t = 0; t < NUM_THREADS; t++) {
+        printf("In main: creating thread %ld\n", t);
+        thread_data_array[t].thread_id = t;
+        strcpy(thread_data_array[t].chromosome, chromosomes[t]);
+        rc = pthread_create(&threads[t], NULL, processChromosome, (void *)&thread_data_array[t]);
+        if (rc) {
+            printf("ERROR; return code from pthread_create() is %d\n", rc);
+            exit(-1);
+        }
+    }
+
+    // Wait for all threads to complete
+    for(t = 0; t < NUM_THREADS; t++) {
+        pthread_join(threads[t], NULL);
+    }
+
+    // Here you would add the logic to merge all VCFs using either GATK or another tool
+
+    printf("Main: program completed. Exiting.\n");
+    pthread_exit(NULL);
+}
+```
+
+### Step 4: Merge VCFs
+
+After calling variants for each chromosome, we merged the resulting VCF files into a single VCF file using the `MergeVcfs` tool from the GATK:
+
+```sh
+gatk MergeVcfs \
+    -I chr1_filtered_snps.vcf \
+    -I chr2_filtered_snps.vcf \
+    ... \
+    -O merged_filtered_snps.vcf
+```
+
+Alternative was `bcftools`:
+
+```sh
+bcftools concat chr1_filtered_snps.vcf chr2_filtered_snps.vcf ... -o merged_filtered_snps.vcf -O v
+```
+
+Finally, we received the merged VCF file `merged_filtered_snps.vcf`, which was used for further analysis.
+
 
 ## Additional Information
 
