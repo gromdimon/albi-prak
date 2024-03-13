@@ -215,7 +215,7 @@ void *splitBamFile(void *threadarg) {
     printf("Thread %d splitting BAM for %s\n", tid, chr);
 
     char command[256];
-    sprintf(command, "samtools view -b input.bam %s > %s.bam", chr, chr);
+    sprintf(command, "/group/albi-praktikum2023/software/samtools view -b /group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/pickard_output.bam %s > %s.bam", chr, chr);
     system(command);
 
     printf("Thread %d finished splitting BAM for %s\n", tid, chr);
@@ -279,7 +279,13 @@ gatk VariantFiltration \
     --filter-name "SNP_FILTER"
 ```
 
-Similarly to previous step, we wrote a c skript to run these commands in parallel (that's not the final version of the script):
+Also, we had to index each `.bam` file, which was done using the following command:
+
+```sh
+samtools index %s_marked.bam
+```
+
+Similarly to previous step, we wrote a c skript to run these commands in parallel:
 
 ```c
 #include <pthread.h>
@@ -287,11 +293,11 @@ Similarly to previous step, we wrote a c skript to run these commands in paralle
 #include <stdlib.h>
 #include <string.h>
 
-#define NUM_THREADS 2 // This should match the number of chromosomes or tasks
+#define NUM_THREADS 24 // This should match the number of chromosomes or tasks
 
 typedef struct {
     int thread_id;
-    char chromosome[10]; // Adjust size as needed
+    char chromosome[24]; // Adjust size as needed
 } thread_data;
 
 void *processChromosome(void *threadarg) {
@@ -304,16 +310,20 @@ void *processChromosome(void *threadarg) {
 
     // Construct command strings (simplified here)
     char markDupCmd[256];
-    sprintf(markDupCmd, "gatk MarkDuplicates -I %s.bam -O %s_marked.bam -M %s_metrics.txt", chr, chr, chr);
+    sprintf(markDupCmd, "/group/albi-praktikum2023/software/gatk MarkDuplicates -I %s.bam -O %s_marked.bam -M %s_metrics.txt", chr, chr, chr);
+
+    char indexBamFileCmd[256];
+    sprintf(indexBamFileCmd, "samtools index %s_marked.bam", chr);
 
     char callVarCmd[256];
-    sprintf(callVarCmd, "gatk HaplotypeCaller -R reference.fasta -I %s_marked.bam -O %s_raw.vcf", chr, chr);
+    sprintf(callVarCmd, "/group/albi-praktikum2023/software/gatk HaplotypeCaller -R /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna -I %s_marked.bam -O %s_raw.vcf", chr, chr);
 
     char filterSNPsCmd[256];
-    sprintf(filterSNPsCmd, "gatk VariantFiltration -R reference.fasta -V %s_raw.vcf -O %s_filtered.vcf --filter-expression \"QD < 2.0 || FS > 60.0 || MQ < 40.0\" --filter-name \"SNP_FILTER\"", chr, chr);
+    sprintf(filterSNPsCmd, "/group/albi-praktikum2023/software/gatk VariantFiltration -R /group/albi-praktikum2023/data/NCBI-reference/GRCh38.fna -V %s_raw.vcf -O %s_filtered.vcf --filter-expression \"QD < 2.0 || FS > 60.0 || MQ < 40.0\" --filter-name \"SNP_FILTER\"", chr, chr);
 
     // Execute commands
     system(markDupCmd);
+    system(indexBamFileCmd);
     system(callVarCmd);
     system(filterSNPsCmd);
 
@@ -327,7 +337,7 @@ int main () {
     int rc;
     long t;
 
-    char *chromosomes[] = {"chr1", "chr2"}; // Example chromosome names
+    char *chromosomes[] = {"chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX", "chrY"};
 
     for(t = 0; t < NUM_THREADS; t++) {
         printf("In main: creating thread %ld\n", t);
@@ -344,8 +354,6 @@ int main () {
     for(t = 0; t < NUM_THREADS; t++) {
         pthread_join(threads[t], NULL);
     }
-
-    // Here you would add the logic to merge all VCFs using either GATK or another tool
 
     printf("Main: program completed. Exiting.\n");
     pthread_exit(NULL);
