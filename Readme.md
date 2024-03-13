@@ -364,12 +364,6 @@ gatk MergeVcfs \
     -O merged_filtered_snps.vcf
 ```
 
-Alternative was `bcftools`:
-
-```sh
-bcftools concat chr1_filtered_snps.vcf chr2_filtered_snps.vcf ... -o merged_filtered_snps.vcf -O v
-```
-
 Finally, we received the merged VCF file `merged_filtered_snps.vcf`, which was used for further analysis.
 
 ### Step 5: Analyse and filtering of given VCF file
