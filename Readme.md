@@ -443,7 +443,7 @@ First, specify the path to the VCF (Variant Call Format) file containing SNP dat
 vcf_path="/group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/chrX_filtered.vcf"
 ```
 
-2 The following command counts the number of heterozygous SNPs present on the X chromosome.
+2. The following command counts the number of heterozygous SNPs present on the X chromosome.
 ```bash
 heterozygous_snps=$(/group/albi-praktikum2023/software/bcftools view -H $vcf_path | awk '{if($10 ~ "0/1" || $10 ~ "1/0") print $0}' | wc -l)
 ```
