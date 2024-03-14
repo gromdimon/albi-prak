@@ -434,7 +434,7 @@ cat /group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/dbSNPfiltered.vcf | gr
 ```
 Ouput contained no strings, which means new file consist only of SNP
 
-### Step 6 Determination of the Individual's Sex Based on X Chromosome SNP Analysis
+### Step 6: Determination of the Individual's Sex Based on X Chromosome SNP Analysis
 We tried to determine the sex of an individual by analyzing the ratio of heterozygous single nucleotide polymorphisms (SNPs) to total SNPs on the X chromosome.
 
 1. Setting the Path to the VCF File
