@@ -434,6 +434,33 @@ cat /group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/dbSNPfiltered.vcf | gr
 ```
 Ouput contained no strings, which means new file consist only of SNP
 
+### Step 6 Determination of the Individual's Sex Based on X Chromosome SNP Analysis
+We tried to determine the sex of an individual by analyzing the ratio of heterozygous single nucleotide polymorphisms (SNPs) to total SNPs on the X chromosome.
+
+1. Setting the Path to the VCF File
+First, specify the path to the VCF (Variant Call Format) file containing SNP data for the X chromosome.
+```bash
+vcf_path="/group/albi-praktikum2023/analysis/gruppe_3/aufgabe03/chrX_filtered.vcf"
+```
+
+2 The following command counts the number of heterozygous SNPs present on the X chromosome.
+```bash
+heterozygous_snps=$(/group/albi-praktikum2023/software/bcftools view -H $vcf_path | awk '{if($10 ~ "0/1" || $10 ~ "1/0") print $0}' | wc -l)
+```
+
+3. Then we count the total number of SNPs present on the X chromosome.
+```bash
+total_snps=$(/group/albi-praktikum2023/software/bcftools view -H $vcf_path | wc -l)
+```
+
+4. The ratio is calculated as follows:
+```bash
+ratio=$(echo "scale=2; $heterozygous_snps / $total_snps" | bc)
+```
+
+5. Analysis Result:
+Based on the results of the analysis, with 87,296 heterozygous SNPs and a total of 156,862 SNPs on the X chromosome, the ratio is 0.55. This relatively high ratio suggests that the individual is likely female.
+
 ## Additional Information
 
 N/A
