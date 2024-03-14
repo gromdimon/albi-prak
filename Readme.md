@@ -45,8 +45,7 @@ Since the FastQC was already installed on the server, we could run it using the 
 ```sh
 /group/albi-praktikum2023/software/fastqc -o /group/albi-praktikum2023/analysis/gruppe_3/aufgabe01 --noextract -f fastq /group/albi-praktikum2023/data/1000-Genome-Project/gruppe3/* .fastq.gz
 ```
-
-...
+![resultsFastQC]()
 
 ## Day2: Mapping Workflow
 
