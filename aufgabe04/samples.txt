@@ -1,0 +1,12 @@
+SAMPLE_NAME
+20
+3:20
+sample
+5:20
+6:20
+7:20
+8:20
+sample1
+alignment
+11:sample
+12:SAMPLE_NAME

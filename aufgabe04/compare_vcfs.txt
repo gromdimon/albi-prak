@@ -1,0 +1,26 @@
+Initial unique SNPs in Individual 3: 4129811
+Unique SNPs after including gruppe 1: 902076
+Decrease in unique SNPs: 78.15%
+Unique SNPs after including gruppe 2: 1498732
+Decrease in unique SNPs: 63.70%
+Unique SNPs after including gruppe 4: 1750020
+Decrease in unique SNPs: 57.62%
+Unique SNPs after including gruppe 5: 1777832
+Decrease in unique SNPs: 56.95%
+Unique SNPs after including gruppe 6: 1767605
+Decrease in unique SNPs: 57.19%
+Unique SNPs after including gruppe 7: 1682734
+Decrease in unique SNPs: 59.25%
+Unique SNPs after including gruppe 8: 1673782
+Decrease in unique SNPs: 59.47%
+Unique SNPs after including gruppe 9: 1659713
+Decrease in unique SNPs: 59.81%
+Unique SNPs after including gruppe 10: 1525790
+Decrease in unique SNPs: 63.05%
+Unique SNPs after including gruppe 11: 1525718
+Decrease in unique SNPs: 63.05%
+Unique SNPs after including gruppe 12: 1598071
+Decrease in unique SNPs: 61.30%
+-----
+Unique SNPs after including all groups: 226015
+Decrease is: 94.52%
