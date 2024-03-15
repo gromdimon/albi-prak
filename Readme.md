@@ -23,6 +23,8 @@ The practical part of the course "Algorithmische Bioinformatik" (Algorithmic Bio
     - [Step 4: Merge VCFs](#step-4-merge-vcfs)
     - [Step 5: Analyse and filtering of given VCF file](#step-5-analyse-and-filtering-of-given-vcf-file)
     - [Step 6: Determination of the Individual's Sex Based on X Chromosome SNP Analysis](#step-6-determination-of-the-individual's-sex-based-on-x-chromosome-snp-analysis)
+    - [Step 7: Comparing different Individuals](#step-7-comparing-different-individuals)
+- [Day4: SNV Pathological Analysis](#day4-snv-pathological-analysis)
 - [Additional Information](#additional-information)
 - [Supervisors](#supervisors)
 - [Contributors](#contributors)
@@ -462,6 +464,101 @@ ratio=$(echo "scale=2; $heterozygous_snps / $total_snps" | bc)
 
 5. Analysis Result:
 Based on the results of the analysis, with 87,296 heterozygous SNPs and a total of 156,862 SNPs on the X chromosome, the ratio is 0.55. This relatively high ratio suggests that the individual is likely female.
+
+### Step 7: Comparing different Individuals
+
+We compared the VCF files of different individuals to identify common and unique variants. We used the `bcftools` to perform this task.
+Here is the bash script we used to compare the VCF files of different individuals:
+
+```sh
+#!/bin/bash
+
+# Directories
+input_vcf_dir="/group/albi-praktikum2023/SNPs"
+output_dir_base="/group/albi-praktikum2023/analysis/gruppe_3/aufgabe04"
+
+# Ensure the base output directory exists
+mkdir -p "$output_dir_base"
+
+# Initial count of unique SNPs in Individual 3
+initial_unique=$(bcftools view -H "${input_vcf_dir}/gruppe3.vcf" | wc -l)
+echo "Initial unique SNPs in Individual 3: $initial_unique"
+
+# Define the list of groups to compare against (excluding group 3 itself if listed)
+groups=(1 2 4 5 6 7 8 9 10 11 12)
+
+for i in "${groups[@]}"; do
+  # Specific output directory for this comparison
+  output_dir="${output_dir_base}/unique_to_3_vs_${i}"
+  mkdir -p "$output_dir"
+
+  # Find unique SNPs for Individual 3 compared to Individual i
+  bcftools isec -c none -C "${input_vcf_dir}/gruppe3.vcf.gz" "${input_vcf_dir}/gruppe${i}.vcf.gz" -Oz -p "$output_dir"
+
+  # Count the number of unique SNPs for this comparison
+  # Assuming the unique SNPs are in the 0000.vcf.gz file created by bcftools isec
+  if [[ -f "${output_dir}/0000.vcf.gz" ]]; then
+    unique_snps=$(zcat "${output_dir}/0000.vcf.gz" | grep -v "^#" | wc -l)
+  else
+    unique_snps=0
+  fi
+
+  echo "Unique SNPs after including gruppe $i: $unique_snps"
+  decrease=$(echo "scale=2; 100 * ($initial_unique - $unique_snps) / $initial_unique" | bc)
+  echo "Decrease in unique SNPs: ${decrease}%"
+done
+```
+
+The result of the comparison we visualized in this logs:
+
+```txt
+Initial unique SNPs in Individual 3: 4129811
+Unique SNPs after including gruppe 1: 902076
+Decrease in unique SNPs: 78.15%
+Unique SNPs after including gruppe 2: 1498732
+Decrease in unique SNPs: 63.70%
+Unique SNPs after including gruppe 4: 1750020
+Decrease in unique SNPs: 57.62%
+Unique SNPs after including gruppe 5: 1777832
+Decrease in unique SNPs: 56.95%
+Unique SNPs after including gruppe 6: 1767605
+Decrease in unique SNPs: 57.19%
+Unique SNPs after including gruppe 7: 1682734
+Decrease in unique SNPs: 59.25%
+Unique SNPs after including gruppe 8: 1673782
+Decrease in unique SNPs: 59.47%
+Unique SNPs after including gruppe 9: 1659713
+Decrease in unique SNPs: 59.81%
+Unique SNPs after including gruppe 10: 1525790
+Decrease in unique SNPs: 63.05%
+Unique SNPs after including gruppe 11: 1525718
+Decrease in unique SNPs: 63.05%
+Unique SNPs after including gruppe 12: 1598071
+Decrease in unique SNPs: 61.30%
+-----
+Unique SNPs after including all groups: 226015
+Decrease is: 94.52%
+```
+
+The results show that the number of unique SNPs in Individual 3 decreases significantly when compared to other individuals. This suggests that Individual 3 shares a large number of SNPs with other individuals.
+
+Next we computed the hamming distance between the VCF files of different individuals. The hamming distance is a measure of the number of positions at which the corresponding elements in two sequences are different. The script for this task can be found in `aufgabe04/compare_all_2_all.py`.
+
+The following heatmap shows the hamming distance between the VCF files of different individuals:
+
+![heatmap](aufgabe04/hamming_distance_heatmap.png)
+
+For further visualization, we used MDS (Multidimensional Scaling) to visualize the genetic distance between the individuals. The script for this task can be found in `aufgabe04/visualize_distance_matrix.py`.
+
+The following plot shows the genetic distance between the individuals:
+
+![mds](aufgabe04/distance_matrix_mds.png)
+
+As we can see from the heatmap and the MDS plot, the individuals are clustered based on their genetic distance. This suggests that the genetic distance between the individuals can be used to identify patterns and relationships between them. As we primarly worked on Individual 3, we can see that it is genetically closer to Individual 4, 5 and 6.
+
+## Day4: SNV Pathological Analysis
+
+TODO 
 
 ## Additional Information
 
