@@ -49,6 +49,8 @@ Since the FastQC was already installed on the server, we could run it using the 
 ```sh
 /group/albi-praktikum2023/software/fastqc -o /group/albi-praktikum2023/analysis/gruppe_3/aufgabe01 --noextract -f fastq /group/albi-praktikum2023/data/1000-Genome-Project/gruppe3/* .fastq.gz
 ```
+
+TODO
 ![resultsFastQC]()
 
 ## Day2: Mapping Workflow
@@ -144,6 +146,7 @@ This was the output of the command:
 
 What we've seen in IGV:
 
+TODO
 ![IGV]()
 
 ## Step 5: Calculate Coverage for Each Chromosome
@@ -162,7 +165,7 @@ samtools depth -a aligned_reads_sorted.bam | awk '{cov[$1]+=$3; count[$1]++} END
 bedtools genomecov -ibam aligned_reads_sorted.bam -g reference_genome.fasta.fai > genome_coverage.txt
 ```
 
-The results can be seen in the files `aufgabe02/samtools_cov_per_chr.txt` and `aufgabe02/bedtools_cov_per_chr.txt`.
+The results can be seen in the files `mapping/samtools_cov_per_chr.txt` and `mapping/bedtools_cov_per_chr.txt`.
 
 ## Day3: Variant Calling
 
@@ -542,17 +545,17 @@ Decrease is: 94.52%
 
 The results show that the number of unique SNPs in Individual 3 decreases significantly when compared to other individuals. This suggests that Individual 3 shares a large number of SNPs with other individuals.
 
-Next we computed the hamming distance between the VCF files of different individuals. The hamming distance is a measure of the number of positions at which the corresponding elements in two sequences are different. The script for this task can be found in `aufgabe04/compare_all_2_all.py`.
+Next we computed the hamming distance between the VCF files of different individuals. The hamming distance is a measure of the number of positions at which the corresponding elements in two sequences are different. The script for this task can be found in `vcf_comparison/compare_all_2_all.py`.
 
 The following heatmap shows the hamming distance between the VCF files of different individuals:
 
-![heatmap](aufgabe04/hamming_distance_heatmap.png)
+![heatmap](vcf_comparison/hamming_distance_heatmap.png)
 
-For further visualization, we used MDS (Multidimensional Scaling) to visualize the genetic distance between the individuals. The script for this task can be found in `aufgabe04/visualize_distance_matrix.py`.
+For further visualization, we used MDS (Multidimensional Scaling) to visualize the genetic distance between the individuals. The script for this task can be found in `vcf_comparison/visualize_distance_matrix.py`.
 
 The following plot shows the genetic distance between the individuals:
 
-![mds](aufgabe04/distance_matrix_mds.png)
+![mds](vcf_comparison/distance_matrix_mds.png)
 
 As we can see from the heatmap and the MDS plot, the individuals are clustered based on their genetic distance. This suggests that the genetic distance between the individuals can be used to identify patterns and relationships between them. As we primarly worked on Individual 3, we can see that it is genetically closer to Individual 4, 5 and 6.
 
