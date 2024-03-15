@@ -21,6 +21,7 @@ The practical part of the course "Algorithmische Bioinformatik" (Algorithmic Bio
     - [Step 2: Splitting bam file by chromosome](#step-2-splitting-bam-file-by-chromosome)
     - [Step 3: Variant Calling](#step-3-variant-calling)
     - [Step 4: Merge VCFs](#step-4-merge-vcfs)
+    - [Step 5: Analyse and filtering of given VCF file](#step-5-analyse-and-filtering-of-given-vcf-file)
 - [Additional Information](#additional-information)
 - [Supervisors](#supervisors)
 - [Contributors](#contributors)
